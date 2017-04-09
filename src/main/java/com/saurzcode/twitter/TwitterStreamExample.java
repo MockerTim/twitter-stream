@@ -28,7 +28,7 @@ public class TwitterStreamExample {
     public static void run(String consumerKey, String consumerSecret,
                            String token, String secret) throws InterruptedException {
 
-        BlockingQueue<String> queue = new LinkedBlockingQueue<>(10000);
+        BlockingQueue<String> queue = new LinkedBlockingQueue<String>(10000);
         StatusesFilterEndpoint endpoint = new StatusesFilterEndpoint();
         // add some track terms
         endpoint.trackTerms(Lists.newArrayList("twitterapi", "#AAPSweep"));

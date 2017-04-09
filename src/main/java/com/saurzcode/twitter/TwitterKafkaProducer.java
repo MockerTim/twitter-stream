@@ -16,6 +16,7 @@ import com.twitter.hbc.core.endpoint.StatusesFilterEndpoint;
 import com.twitter.hbc.core.processor.StringDelimitedProcessor;
 import com.twitter.hbc.httpclient.auth.Authentication;
 import com.twitter.hbc.httpclient.auth.OAuth1;
+import org.apache.log4j.BasicConfigurator;
 
 /**
  *
@@ -34,7 +35,7 @@ public class TwitterKafkaProducer {
 	 */
 	public static void run(String consumerKey, String consumerSecret,
 			String token, String secret) throws InterruptedException {
-
+		System.out.print("Configuring kafka producer... ");
 		Properties properties = new Properties();
 		properties.put("metadata.broker.list", "localhost:9092");
 		properties.put("serializer.class", "kafka.serializer.StringEncoder");
@@ -42,9 +43,10 @@ public class TwitterKafkaProducer {
 
 		ProducerConfig producerConfig = new ProducerConfig(properties);
 		Producer<String, String> producer =
-				new Producer<>(producerConfig);
-
-		BlockingQueue<String> queue = new LinkedBlockingQueue<>(10000);
+				new Producer<String, String>(producerConfig);
+		System.out.println(" done.");
+		System.out.print("Configuring and starting twitter client... ");
+		BlockingQueue<String> queue = new LinkedBlockingQueue<String>(10000);
 		StatusesFilterEndpoint endpoint = new StatusesFilterEndpoint();
 		// add some track terms
 		endpoint.trackTerms(
@@ -61,12 +63,13 @@ public class TwitterKafkaProducer {
 
 		// Establish a connection
 		client.connect();
-
+		System.out.println(" done.");
+		System.out.println("Sending messages ... ");
 		// Do whatever needs to be done with messages
 		for (int msgRead = 0; msgRead < 100; msgRead++) {
 			KeyedMessage<String, String> message = null;
 			try {
-				message = new KeyedMessage<>(topic, queue.take());
+				message = new KeyedMessage<String, String>(topic, queue.take());
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
@@ -85,6 +88,7 @@ public class TwitterKafkaProducer {
 	 * @param args
 	 */
 	public static void main(String[] args) {
+//		BasicConfigurator.configure();
 		if(args.length < 4) {
 			System.out.println("Usage: java TwitterKafkaProducer consumerKey "
 					+ "consumerSecret token secret");

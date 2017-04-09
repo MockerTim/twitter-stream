@@ -13,8 +13,8 @@
 		</dependency>
 		<dependency>
 			<groupId>org.apache.kafka</groupId>
-			<artifactId>kafka_2.8.0</artifactId>
-			<version>0.8.1.1</version>
+			<artifactId>kafka_2.10</artifactId>
+			<version>0.8.2.2</version>
 		</dependency>
 		<dependency>
 			<groupId>log4j</groupId>
@@ -27,16 +27,16 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
-		<dependency>
+		<!--dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-simple</artifactId>
 			<version>1.6.4</version>
-		</dependency>
-		<dependency>
+		</dependency-->
+		<!--dependency>
 			<groupId>com.google.guava</groupId>
 			<artifactId>guava</artifactId>
 			<version>18.0</version>
-		</dependency>
+		</dependency-->
 
 	</dependencies>
 </project>
