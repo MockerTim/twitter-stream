@@ -1,7 +1,7 @@
 # twitter-stream
 Twitter-Kafka Data Pipeline
 
-#Requirements :  
+# Requirements :  
 
 Apache Kafka 0.8
 
@@ -11,7 +11,7 @@ Apache Zookeeper ( required for Kafka)
 
 Oracle JDK 1.7 (64 bit )
 
-#Build Environment :
+# Build Environment :
 
 Eclipse
 Apache Maven 2/3
