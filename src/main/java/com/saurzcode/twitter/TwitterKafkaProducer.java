@@ -4,6 +4,7 @@ import java.util.Properties;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
+import kafka.javaapi.producer.Producer;
 import kafka.producer.KeyedMessage;
 import kafka.producer.ProducerConfig;
 
@@ -16,10 +17,21 @@ import com.twitter.hbc.core.processor.StringDelimitedProcessor;
 import com.twitter.hbc.httpclient.auth.Authentication;
 import com.twitter.hbc.httpclient.auth.OAuth1;
 
+/**
+ *
+ */
 public class TwitterKafkaProducer {
 
 	private static final String topic = "twitter-topic";
 
+	/**
+	 *
+	 * @param consumerKey
+	 * @param consumerSecret
+	 * @param token
+	 * @param secret
+	 * @throws InterruptedException
+	 */
 	public static void run(String consumerKey, String consumerSecret,
 			String token, String secret) throws InterruptedException {
 
@@ -27,15 +39,16 @@ public class TwitterKafkaProducer {
 		properties.put("metadata.broker.list", "localhost:9092");
 		properties.put("serializer.class", "kafka.serializer.StringEncoder");
 		properties.put("client.id","camus");
-		ProducerConfig producerConfig = new ProducerConfig(properties);
-		kafka.javaapi.producer.Producer<String, String> producer = new kafka.javaapi.producer.Producer<String, String>(
-				producerConfig);
 
-		BlockingQueue<String> queue = new LinkedBlockingQueue<String>(10000);
+		ProducerConfig producerConfig = new ProducerConfig(properties);
+		Producer<String, String> producer =
+				new Producer<>(producerConfig);
+
+		BlockingQueue<String> queue = new LinkedBlockingQueue<>(10000);
 		StatusesFilterEndpoint endpoint = new StatusesFilterEndpoint();
 		// add some track terms
-		endpoint.trackTerms(Lists.newArrayList("twitterapi",
-				"#AAPSweep"));
+		endpoint.trackTerms(
+				Lists.newArrayList("twitterapi", "#AAPSweep", "#makeitcount"));
 
 		Authentication auth = new OAuth1(consumerKey, consumerSecret, token,
 				secret);
@@ -50,21 +63,33 @@ public class TwitterKafkaProducer {
 		client.connect();
 
 		// Do whatever needs to be done with messages
-		for (int msgRead = 0; msgRead < 1000; msgRead++) {
+		for (int msgRead = 0; msgRead < 100; msgRead++) {
 			KeyedMessage<String, String> message = null;
 			try {
-				message = new KeyedMessage<String, String>(topic, queue.take());
+				message = new KeyedMessage<>(topic, queue.take());
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
 			producer.send(message);
+			System.out.println("Message ["+msgRead+"] sent. \nTopic: "
+					+ message.topic() + ", Product prefix: "
+					+ message.productPrefix() + ", \nmsg: "
+					+ message.message());
 		}
 		producer.close();
 		client.stop();
-
 	}
 
+	/**
+	 *
+	 * @param args
+	 */
 	public static void main(String[] args) {
+		if(args.length < 4) {
+			System.out.println("Usage: java TwitterKafkaProducer consumerKey "
+					+ "consumerSecret token secret");
+			return;
+		}
 		try {
 			TwitterKafkaProducer.run(args[0], args[1], args[2], args[3]);
 		} catch (InterruptedException e) {
